@@ -1,0 +1,33 @@
+<%- include('header') -%>
+
+<h1>Innskráning</h1>
+
+<form class="form" method="post" action="/register" autocomplete="off">
+  <div class="field field--input<%= locals.isInvalid('name', errors) ?  ' field--invalid' : '' %>">
+    <label for="name">Nafn</label>
+    <input type="text" name="name" id="name" value="<%= data.name %>">
+  </div>
+  <div class="field field--input<%= locals.isInvalid('username', errors) ?  ' field--invalid' : '' %>">
+    <label for="username">Notendanafn</label>
+    <input type="text" name="username" id="username" value="<%= data.username %>">
+  </div>
+  <div class="field field--input<%= locals.isInvalid('password', errors) ?  ' field--invalid' : '' %>">
+    <label for="password">Lykilorð</label>
+    <input type="password" name="password" id="password">
+  </div>
+
+  <% if (errors.length > 0) { %>
+    <h3 class="errors__title">Villur við nýskráningu:</h3>
+    <ul class="errors">
+      <% errors.forEach((error) => { %>
+        <li class="error"><label for="<%= error.param %>"><%= error.msg %></label></li>
+      <% }); %>
+    </ul>
+  <% } %>
+
+  <button class="button">Nýskrá</button>
+</form>
+
+<a href="/">Til baka</a>
+
+<%- include('footer') -%>

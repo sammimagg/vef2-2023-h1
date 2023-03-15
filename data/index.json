@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Hagfræðideild",
+    "description": "Menntun í Hagfræðideild er greiðasta leiðin til þátttöku, rannsókna og skilnings á hagkerfi okkar. Kennslan stendur á sterkum grunni og er markmið námsins að veita nemendum góðan undirbúning í hagfræði, stærðfræði og tölfræði og möguleika á sérhæfingu í öðrum greinum.",
+    "csv": "hagfraedi.csv"
+  },
+  {
+    "title": "Iðnaðarverkfræði-, vélaverkfræði- og tölvunarfræðideild",
+    "description": "Deildin býður upp á fjölbreytt námsframboð verkfræði- og tölvunarfræðigreina. Þessar greinar eiga það sameiginlegt að vera afar hagnýtar og þýðingarmiklar við uppbyggingu og rekstur nútíma þjóðfélaga.",
+    "csv": "ivt.csv"
+  },
+  {
+    "title": "Íslensku og menningardeild",
+    "description": "Íslensku- og menningardeild er ein fjögurra deilda á Hugvísindasviði og er ein sú fjölmennasta innan Háskólans. Í deildinni eru nú kenndar milli 10 og 20 greinar, sumar bæði á grunn- og framhaldsstigi, en sumar eingöngu í grunnnámi og aðrar eingöngu í framhaldsnámi.",
+    "csv": "islenska.csv"
+  },
+  {
+    "title": "Læknadeild",
+    "description": "Læknadeild annast kennslu og rannsóknir í geislafræði, heilbrigðisgagnafræði, lífeindafræði, læknisfræði og sjúkraþjálfunarfræði. Deildin starfar í nánu samstarfi við Landspítala og fleiri heilbrigðisstofnanir innanlands og utan. Læknadeild er leiðandi í kennslu og rannsóknum í heilbrigðisvísindum hér á landi.",
+    "csv": "laeknadeild.csv"
+  },
+  {
+    "title": "Sálfræðideild",
+    "description": "Sálfræði er vísindagrein um huga, heila og hátterni. Grundvöllur sálfræðinnar er fjölbreytilegt rannsóknastarf en greinin er víða hagnýtt, meðal annars í skólum, meðferðarstarfi og atvinnulífi.",
+    "csv": "salfraedideild.csv"
+  },
+  {
+    "title": "Stjórnmálafræði",
+    "description": "Stjórnmálafræðideild býður upp á fjölbreytta námsmöguleika bæði í grunn- og framhaldsnámi. Námið veitir útskrifuðum nemendum ótal möguleika á að velja sér starf að námi loknu og stjórnmálafræðingar hafa haslað sér völl víðs vegar í atvinnulífinu á undanförnum árum.",
+    "csv": "stjornmalafraedi.csv"
+  },
+  {
+    "title": "Viðskiptafræði",
+    "description": "Viðskiptafræðideild hefur gegnt forystuhlutverki í menntun stjórnenda og sérfræðinga á sviði viðskiptafræði í áratugi. Deildin hefur lagt metnað sinn í að miðla alþjóðlega viðurkenndri þekkingu með því að vera leiðandi í rannsóknum, kennslu og þjónustu við íslenskt atvinnulíf.",
+    "csv": "vidskiptafraedi.csv"
+  }
+]

@@ -1,0 +1,57 @@
+<%- include('header') -%>
+
+<section class="event">
+  <div class="event__info">
+    <h1 class="event__title"><%= event.name %></h1>
+    <p class="event__description"><%= event.description %></p>
+    <% if (event.location) { %>
+      <p class="event__location"><strong>Staðsetning: </strong><%= event.location %></p>
+    <% } %>
+    <% if (event.url) { %>
+      <p class="event__url"><strong>URL: </strong><a href="<%= event.url %>"><%= event.url %></a></p>
+    <% } %>
+  </div>
+
+  <div class="event__registered">
+    <h2 class="event__subtitle">Skráningar á viðburð</h2>
+    <% if (registered.length === 0) { %>
+      <p class="event__empty">Engin hefur skráð sig á þennan viðburð</p>
+    <% } else { %>
+      <ul class="event__registeredList">
+        <% registered.forEach((entry) => { %>
+          <li class="event__registeredItem">
+            <span class="event__registeredName"><%= entry.name %></span>
+            <% if (entry.comment) { %>
+              <span class="event__registeredComment"><%= entry.comment %></span>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </div>
+  <div class="event__registration">
+    <h2 class="event__subtitle">Skráðu þig</h2>
+    <% if (user) { %>
+      <% if (userRegistration) { %>
+        <p>Þú hefur skráð þig á þennan viðburð.</p>
+      <% } else { %>
+        <form method="post" action="/<%= event.slug %>" enctype="application/x-www-form-urlencoded" class="">
+
+          <div class="field field--textarea<%= locals.isInvalid('comment', errors) ?  ' field--invalid' : '' %>">
+            <label for="comment">Athugasemd:</label>
+            <textarea name="comment" id="comment"><%= data.comment %></textarea>
+          </div>
+
+          <button class="button">Skrá mig</button>
+        </form>
+      <% } %>
+    <% } else { %>
+      <p class="event__login"><a href="/login">Skráðu þig</a> inn til að skrá þig á viðburðinn.</p>
+    <% } %>
+  </div>
+  <div class="link">
+    <a class="link__link" href="/">Til baka</a>
+  </div>
+</section>
+
+<%- include('footer') -%>
