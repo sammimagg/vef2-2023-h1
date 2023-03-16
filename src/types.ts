@@ -18,8 +18,8 @@ export type User = {
 }
 
 interface PassportRequest {
-  isAuthenticated(): boolean;
-}
+    isAuthenticated(): boolean;
+  }
 
 interface RequestWithUser extends Request {
   user?: User;
@@ -29,7 +29,7 @@ interface PassportRequest {
   isAuthenticated(): boolean;
 }
 
-export type CustomRequest = RequestWithUser & PassportRequest;
+export type CustomRequest = RequestWithUser & PassportRequest & { user?: User }
 
 export type UserWithoutPassword = Omit<User, 'password'>;
 /*  

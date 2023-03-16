@@ -63,7 +63,8 @@ export function ensureAdmin(req: CustomRequest, res: Response, next: NextFunctio
   }
 
   const title = 'Síða fannst ekki';
-  return res.status(404).render('error', { title });
+  return res.status(404).json({ 
+                                message: title });
 }
 
 
