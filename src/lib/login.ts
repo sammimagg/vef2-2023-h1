@@ -1,26 +1,21 @@
-import { NextFunction } from 'express';
-import passport from 'passport';
+import passport, { PassportStatic } from 'passport';
 import { Strategy } from 'passport-local';
+import { Request, Response, NextFunction } from 'express';
 import { comparePasswords, findById, findByUsername } from './users.js';
+import { CustomRequest, User, UserWithoutPassword  } from '../types.js'; // Import User type from the corresponding file
 
-/**
- * Athugar hvort username og password sé til í notandakerfi.
- * Callback tekur við villu sem fyrsta argument, annað argument er
- * - `false` ef notandi ekki til eða lykilorð vitlaust
- * - Notandahlutur ef rétt
- *
- * @param {string} username Notandanafn til að athuga
- * @param {string} password Lykilorð til að athuga
- * @param {function} done Fall sem kallað er í með niðurstöðu
- */
-async function strat(username: string, password: string, done) {
+
+async function strat(
+  username: string,
+  password: string,
+  done: (error: any, user?: User | false) => void,
+): Promise<void> {
   try {
     const user = await findByUsername(username);
     if (!user) {
       return done(null, false);
     }
 
-    // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
     const result = await comparePasswords(password, user.password);
     return done(null, result ? user : false);
   } catch (err) {
@@ -29,33 +24,32 @@ async function strat(username: string, password: string, done) {
   }
 }
 
-// Notum local strategy með „strattinu“ okkar til að leita að notanda
 passport.use(new Strategy(strat));
 
-// getum stillt með því að senda options hlut með
-// passport.use(new Strategy({ usernameField: 'email' }, strat));
-
-// Geymum id á notanda í session, það er nóg til að vita hvaða notandi þetta er
-passport.serializeUser((user, done) => {
-  done(null, user.id);
+passport.serializeUser<any, any>((req, user, done) => {
+  done(undefined, user);
 });
 
-// Sækir notanda út frá id
-passport.deserializeUser(async (id, done) => {
+
+
+
+passport.deserializeUser(async (id: number, done: (error: any, user?: UserWithoutPassword | null) => void) => {
   try {
     const user = await findById(id);
 
-    // Pössum að lykilorð geti ekki birtst neinstaðar
-    delete user.password;
-    done(null, user);
+    if (!user) {
+      return done(null, null);
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    done(null, userWithoutPassword);
   } catch (err) {
     done(err);
   }
 });
 
-// Hjálpar middleware sem athugar hvort notandi sé innskráður og hleypir okkur
-// þá áfram, annars sendir á /login
-export function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
+
+export function ensureLoggedIn(req: Request, res: Response, next: NextFunction): void {
   if (req.isAuthenticated()) {
     return next();
   }
@@ -63,7 +57,7 @@ export function ensureLoggedIn(req: Request, res: Response, next: NextFunction) 
   return res.redirect('/login');
 }
 
-export function ensureAdmin(req, res, next) {
+export function ensureAdmin(req: CustomRequest, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user?.admin) {
     return next();
   }
@@ -72,4 +66,5 @@ export function ensureAdmin(req, res, next) {
   return res.status(404).render('error', { title });
 }
 
-export default passport;
+
+export default passport as PassportStatic;

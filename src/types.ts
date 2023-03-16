@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 /*
 CREATE TABLE public.users (
     id serial primary key,
@@ -8,11 +10,28 @@ CREATE TABLE public.users (
   );
 */
 export type User = {
+    id: number,
     name: string,
     username: string,
     password: string,
     admin: boolean
 }
+
+interface PassportRequest {
+  isAuthenticated(): boolean;
+}
+
+interface RequestWithUser extends Request {
+  user?: User;
+}
+
+interface PassportRequest {
+  isAuthenticated(): boolean;
+}
+
+export type CustomRequest = RequestWithUser & PassportRequest;
+
+export type UserWithoutPassword = Omit<User, 'password'>;
 /*  
   CREATE TABLE public.events (
     id SERIAL PRIMARY KEY,
@@ -25,11 +44,26 @@ export type User = {
     updated TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
  */
-export type Events = {
+export type Event = {
+    id: number,
     name: string,
-    comment: string,
-    event: number,
+    slug: string,
+    description: string,
+    location?: string,
+    url?: string,
     created: Date,
+    updated: Date,
+}
+export type EventDb = {
+  id: number,
+  name: string,
+  slug: string,
+  description: string,
+  location?: string,
+  url?: string,
+  comment?: string,
+  created: Date,
+  updated: Date,
 }
 /* 
   CREATE TABLE public.registrations (
@@ -43,7 +77,15 @@ export type Events = {
   );
   */
  export type Registrations = {
+    id: number,
     comment: string,
     created: Date,
     
  }
+ export type RegistrationsDb = {
+  id: number,
+  event_id: number,
+  comment: string,
+  created: Date,
+  
+}

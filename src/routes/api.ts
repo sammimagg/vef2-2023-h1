@@ -1,53 +1,70 @@
-import express, { Request, Response } from 'express';
-import {
-  createCourse,
-  deleteCourse,
-  getCourse,
-  listCourses,
-  updateCourse,
-} from './courses.js';
-import {
-  createDepartment,
-  deleteDepartment,
-  getDepartment,
-  listDepartments,
-  updateDepartment,
-} from './departments.js';
+import express, { NextFunction, Request, Response } from 'express';
+import { listEvents, getEvent } from './event-routes.js';
+import passport from '../lib/login.js';
+import {validationCheck } from '../routes/users-routes.js'
+import { register, registerValidation, registerGet } from '../routes/users-routes.js';
+import { catchErrors } from '../lib/catch-errors.js';
 
 export const router = express.Router();
 
 export async function index(req: Request, res: Response) {
   return res.json([
     {
-      href: '/departments',
+      href: '/events',
       methods: ['GET', 'POST'],
     },
     {
-      href: '/departments/:slug',
+      href: '/events/:slug',
       methods: ['GET', 'PATCH', 'DELETE'],
     },
     {
-      href: '/departments/:slug/courses',
+      href: '/events/:slug/registration',
       methods: ['GET', 'POST'],
     },
     {
-      href: '/departments/:slug/courses/:courseId',
-      methods: ['GET', 'PATCH', 'DELETE'],
+      href: '/signup',
+      methods: ['GET', 'POST'],
     },
+    {
+      href: '/login',
+      methods: ['GET', 'POST'],
+    }
   ]);
 }
 
-// Departments
-router.get('/', index);
-router.get('/departments', listDepartments);
-router.post('/departments', createDepartment);
-router.get('/departments/:slug', getDepartment);
-router.patch('/departments/:slug', updateDepartment);
-router.delete('/departments/:slug', deleteDepartment);
 
-// Courses
-router.get('/departments/:slug/courses', listCourses);
-router.post('/departments/:slug/courses', createCourse);
-router.get('/departments/:slug/courses/:courseId', getCourse);
-router.patch('/departments/:slug/courses/:courseId', updateCourse);
-router.delete('/departments/:slug/courses/:courseId', deleteCourse);
+router.get('/', index);
+
+router.get('/events', listEvents);
+
+router.get('/events/:slug', getEvent);
+
+// router.get('CreateEvent')
+
+router
+  .get('/register', registerGet)
+  .post(
+    '/register',
+    registerValidation,
+    catchErrors(validationCheck),
+    catchErrors(register),
+    passport.authenticate('local', {
+      failureMessage: 'Notandanafn eða lykilorð vitlaust.',
+      failureRedirect: '/login',
+    }),
+    (req: Request, res: Response, next: NextFunction) => {
+      console.log('test');
+      res.json('T'); // Hér vantar
+    },
+  );
+
+//router.post('/login', )
+//router.get('/logout',)
+
+// Möguleiki á að eyða viðburðum og auka gögn
+// Paging á viðburðum
+// Almennir notendur og skráning á viðburði
+// Uppfærslur á pökkum og lagfæringar
+// Yfirlitssíða
+// Stakur viðburður
+// event.html?id=1
