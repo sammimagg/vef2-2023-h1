@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { createUser, findByUsername } from '../lib/users.js';
 import { body, validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { User } from '../types.js';
+import { User,CustomRequest } from '../types.js';
 export async function register(req: Request, res: Response, next: NextFunction) {
     const { name, username, password } = req.body;
     const userToCreate: Omit<User, 'id'>  = {
@@ -95,4 +95,21 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       errors: [],
     });
   }
+  export function login(req: Request, res: Response, next: NextFunction) {
+    if (req.isAuthenticated()) {
+      //if (req.user.admin) return res.redirect('/admin');
   
+      return res.json("Virkar")
+    }
+  
+    let message = '';
+  
+    // Athugum hvort einhver skilaboð séu til í session, ef svo er birtum þau
+    // og hreinsum skilaboð
+    //if (req.session.messages && req.session.messages.length > 0) {
+      //message = req.session.messages.join(', ');
+      //req.session.messages = [];
+    //}
+  
+    return res.json( { message, title: 'Innskráning' });
+  }
