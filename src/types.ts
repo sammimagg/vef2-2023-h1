@@ -1,5 +1,23 @@
 import { Request } from 'express';
+import { IncomingMessage } from 'express';
 
+
+declare global {
+  namespace Express {
+    interface User {
+      id: number;
+      name: string;
+      username: string;
+      password: string;
+      admin: boolean;
+    }
+  }
+}
+export interface CustomRequest extends IncomingMessage {
+  user?: User;
+}
+
+export type UserWithoutPassword = Omit<Express.User, 'password'>;
 /*
 CREATE TABLE public.users (
     id serial primary key,
@@ -17,21 +35,6 @@ export type User = {
     admin: boolean
 }
 
-interface PassportRequest {
-    isAuthenticated(): boolean;
-  }
-
-interface RequestWithUser extends Request {
-  user?: User;
-}
-
-interface PassportRequest {
-  isAuthenticated(): boolean;
-}
-
-export type CustomRequest = RequestWithUser & PassportRequest & { user?: User }
-
-export type UserWithoutPassword = Omit<User, 'password'>;
 /*  
   CREATE TABLE public.events (
     id SERIAL PRIMARY KEY,

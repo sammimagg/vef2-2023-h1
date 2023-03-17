@@ -2,7 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import { createUser, findByUsername } from '../lib/users.js';
 import { body, validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { User,CustomRequest } from '../types.js';
+import { slugify } from '../lib/slugify.js';
+import { User,CustomRequest, Event } from '../types.js';
+import { deleteEvent, listEventByName, createEvent, listEventBySlug } from '../lib/db.js';
+import { listEvent } from '../lib/events.js';
 export async function register(req: Request, res: Response, next: NextFunction) {
     const { name, username, password } = req.body;
     const userToCreate: Omit<User, 'id'>  = {
@@ -97,19 +100,83 @@ export async function register(req: Request, res: Response, next: NextFunction) 
   }
   export function login(req: Request, res: Response, next: NextFunction) {
     if (req.isAuthenticated()) {
-      //if (req.user.admin) return res.redirect('/admin');
+      return res.status(403).json({message: 'You are already logged in.'})
+    }
+    return res.status(200).json({message: 'Login succesful'})
+  }
+  export async function logout(req: Request, res: Response, next: NextFunction) {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.status(200).json({message: "You have been logged out successfully."})
+    });
+  }
+  export function loginSuccesful(req: Request, res: Response, next: NextFunction) {
+    res.status(200).json({ message: 'Log in succesful' });
+  }
+  export function registerSuccesful(req: Request, res: Response, next: NextFunction) {  
+    res.status(200).json({ message: 'Sign up succesful' });
+  }
+  export async function validationCheckUpdate(req: Request, res: Response, next: NextFunction) {
+    const { name, description } = req.body;
+    const { slug } = req.params;
+    const { user } = req;
   
-      return res.json("Virkar")
+    const event = await listEvent(slug);
+  
+    const data = {
+      name,
+      description,
+    };
+  
+    const validation = validationResult(req);
+  
+    const customValidations: any[] = [];
+  
+    const eventNameExists = await listEventByName(name);
+    if ( event === null) {
+      return;
     }
   
-    let message = '';
+    if (eventNameExists !== null && eventNameExists.id !== event.id) {
+      customValidations.push({
+        param: 'name',
+        msg: 'Viðburður með þessu nafni er til',
+      });
+    }
   
-    // Athugum hvort einhver skilaboð séu til í session, ef svo er birtum þau
-    // og hreinsum skilaboð
-    //if (req.session.messages && req.session.messages.length > 0) {
-      //message = req.session.messages.join(', ');
-      //req.session.messages = [];
-    //}
+    if (!validation.isEmpty() || customValidations.length > 0) {
+      return ;
+    }
   
-    return res.json( { message, title: 'Innskráning' });
+    return next();
   }
+
+
+export async function deleteRoute(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+
+  const result = await deleteEvent(parseInt(id));
+
+  if (result) {
+    return res.status(204).json({message: "The event was successfully deleted."})
+  }
+
+  return next(new Error('Error deleting the event.'));
+}
+
+export async function registerRoute(req: Request, res: Response, next: NextFunction) {
+  const { name, description, location, url } = req.body;
+  const slug = slugify(name,'-');
+  if (typeof(slug) !== 'string') {
+    return next(new Error('Villa við að búa til viðburð'));
+  }
+  //const created = await createEvent({ name, slug, description, location, url });
+
+  //if (created) {
+    //return res.redirect('/admin');
+  //}
+
+  return next(new Error('Villa við að búa til viðburð'));
+}
