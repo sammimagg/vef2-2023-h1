@@ -1,10 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { listEvents, getEvent } from './event-routes.js';
-import passport from '../lib/login.js';
-import {validationCheck, login } from '../routes/users-routes.js'
-import { register, registerValidation, registerGet } from '../routes/users-routes.js';
+import { listEvents, getEvent, eventRoute, updateRoute } from './event-routes.js';
+import passport, { ensureAdmin, ensureLoggedIn } from '../lib/login.js'
+import {validationCheck, login, logout, loginSuccesful, registerSuccesful, validationCheckUpdate, registerRoute } from '../routes/users-routes.js'
+import { register, registerValidation, registerGet,deleteRoute } from '../routes/users-routes.js';
 import { catchErrors } from '../lib/catch-errors.js';
 import { CustomRequest, User } from '../types.js';
+import { registrationValidationMiddleware, xssSanitizationMiddleware,sanitizationMiddleware } from '../lib/validation.js';
 export const router = express.Router();
 
 export async function index(req: Request, res: Response) {
@@ -34,57 +35,22 @@ export async function index(req: Request, res: Response) {
 
 
 router.get('/', index);
-
 router.get('/events', listEvents);
-
 router.get('/events/:slug', getEvent);
-
 // router.get('CreateEvent')
-
-router
-  .get('/register', registerGet)
-  .post(
-    '/register',
-    registerValidation,
-    catchErrors(validationCheck),
-    catchErrors(register),
-    passport.authenticate('local', {
-      failureMessage: 'Notandanafn eða lykilorð vitlaust.',
-      failureRedirect: '/login',
-    }),
-    (req: Request, res: Response, next: NextFunction) => {
-      console.log('test');
-      res.json('T'); // Hér vantar
-    },
-  );
-
+router.get('/register', registerGet)
+router.post('/register',registerValidation, catchErrors(validationCheck), catchErrors(register), passport.authenticate('local', {failureMessage: 'Notandanafn eða lykilorð vitlaust.'}), registerSuccesful);
 router.get('/login', login);
-router.post(
-  '/login',
+router.post('/login', passport.authenticate('local', {failureMessage: 'Notandanafn eða lykilorð vitlaust.' }), loginSuccesful);
+router.get('/logout', logout);
 
-  // Þetta notar strat úr lib/passport.js
-  passport.authenticate('local', {
-    failureMessage: 'Notandanafn eða lykilorð vitlaust.'  }),
+router.get('/admin/', ensureLoggedIn, ensureAdmin, listEvents);
+router.post('/admin/', ensureLoggedIn, ensureAdmin, registrationValidationMiddleware('description'), xssSanitizationMiddleware('description'), catchErrors(validationCheck), sanitizationMiddleware('description'), catchErrors(registerRoute));
 
-  // Ef við komumst hingað var notandi skráður inn
-  (req: Request, res: Response, next: NextFunction) => {
-    if (req.hasOwnProperty('authError')) {
-      return res.status(401).json({ message: req.statusMessage});
-    }
-    res.json("Skráður inn")
-  }
-);
-router.get('/logout', async (req: Request, res: Response, next: NextFunction) => {
-  // logout hendir session cookie og session
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    return res.json("Logout")
-  });
-});
-
-
+// Verður að vera seinast svo það taki ekki yfir önnur route
+router.get('/admin/:slug', ensureLoggedIn, ensureAdmin, catchErrors(eventRoute));
+router.post('/admin/:slug', ensureLoggedIn, ensureAdmin, registrationValidationMiddleware('description'), xssSanitizationMiddleware('description'), catchErrors(validationCheckUpdate), sanitizationMiddleware('description'), catchErrors(updateRoute));
+router.post('/admin/delete/:id', ensureLoggedIn,  ensureAdmin,  catchErrors(deleteRoute));
 // Möguleiki á að eyða viðburðum og auka gögn
 // Paging á viðburðum
 // Almennir notendur og skráning á viðburði

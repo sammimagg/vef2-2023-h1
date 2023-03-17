@@ -5,7 +5,7 @@ import { comparePasswords, findById, findByUsername } from './users.js';
 import { CustomRequest, User, UserWithoutPassword  } from '../types.js'; // Import User type from the corresponding file
 
 
-async function strat(
+export async function strat(
   username: string,
   password: string,
   done: (error: any, user?: User | false) => void,
@@ -26,46 +26,43 @@ async function strat(
 
 passport.use(new Strategy(strat));
 
-passport.serializeUser<any, any>((req, user, done) => {
-  done(undefined, user);
+passport.serializeUser((user: any,cb) => {
+cb(null,user.id);
 });
 
-
-
-
-passport.deserializeUser(async (id: number, done: (error: any, user?: UserWithoutPassword | null) => void) => {
-  try {
-    const user = await findById(id);
-
-    if (!user) {
-      return done(null, null);
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    done(null, userWithoutPassword);
-  } catch (err) {
-    done(err);
-  }
+passport.deserializeUser((id: number, cb) => {
+  findById(id)
+    .then(user => {
+      if (user) {
+        const userObject: User = {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          password: user.password,
+          admin: user.admin
+        };
+        cb(null, userObject);
+      } else {
+        cb(null, null);
+      }
+    })
+    .catch(err => {
+      cb(err, null);
+    });
 });
 
-
-export function ensureLoggedIn(req: Request, res: Response, next: NextFunction): void {
+export function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated()) {
     return next();
   }
-
-  return res.redirect('/login');
+  return res.status(403).json({ message: '401 Unauthorized, please log in' });
 }
 
-export function ensureAdmin(req: CustomRequest, res: Response, next: NextFunction) {
+export function ensureAdmin(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user?.admin) {
     return next();
   }
-
-  const title = 'Síða fannst ekki';
-  return res.status(404).json({ 
-                                message: title });
+  return res.status(403).json({ message: '403 Forbidden, User is not Admin' });
 }
-
 
 export default passport as PassportStatic;

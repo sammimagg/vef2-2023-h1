@@ -27,7 +27,6 @@ export async function findByUsername(username: string): Promise<User | false> {
 
 export async function findById(id: number): Promise<User | null> {
   const q = 'SELECT * FROM users WHERE id = $1';
-
   try {
     const result = await query(q, [id]);
 
