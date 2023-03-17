@@ -1,7 +1,7 @@
-import { Event, EventDb } from "../types.js";
+import { Event} from "../types.js";
 
 export function eventMapper(potentialEvent: unknown): Event | null {
-  const event = potentialEvent as EventDb | null;
+  const event = potentialEvent as Event | null;
 
   if (
     !event ||
