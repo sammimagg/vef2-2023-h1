@@ -58,12 +58,10 @@ export async function getEvents(): Promise<Array<Event> | null> {
     return null;
   }
   const event = eventsMapper(result.rows);
-  console.log(event)
   return event;
 }
 export async function getEventBySlug(slug: string): Promise<Event | null> {
-  const result = await query('SELECT * FROM events WHERE slug = $1', [slug,]);
-
+  const result = await query('SELECT * FROM events WHERE slug = $1', [slug]);
   if(!result) {
     return null;
   }
@@ -131,10 +129,11 @@ export async function updateEvent(
 
   return null;
 }
-export async function deleteEvent(eventId: number) {
+export async function deleteEventBySlug(eventId: number): Promise<boolean> {
   const pool = getPool();
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     await client.query('BEGIN');
     const deleteRegistrations = 'DELETE FROM registrations WHERE event = $1';
     await client.query(deleteRegistrations, [eventId]);
@@ -145,29 +144,21 @@ export async function deleteEvent(eventId: number) {
 
     return true;
   } catch (e) {
-    await client.query('ROLLBACK');
     console.error('unable to delete event', e);
+    await client?.query('ROLLBACK');
     return false;
   } finally {
-    client.release();
+    client?.release();
   }
 }
-
-
-
-export async function createEvent({
-  name,
-  slug,
-  location,
-  url,
-  description,
-}: Event): Promise<Event | null> {
+export async function createEvent(event: Omit<Event, 'id'>,silent =false): Promise<Event | null> {
+  const {name, slug, description, url, location} = event
   const q = `
     INSERT INTO events
       (name, slug, location, url, description)
     VALUES
       ($1, $2, $3, $4, $5)
-    RETURNING id, name, slug, description;
+    RETURNING id, name, slug, description, location, url, created, updated;
   `;
   const values = [name, slug, location, url, description];
   const result = await query(q, values);
@@ -179,4 +170,47 @@ export async function createEvent({
   return null;
 }
 
+export async function registerToEvent(userId: number, eventId: number, comment:string) {
+  const q = `
+    INSERT INTO registrations
+      (comment, event, userid)
+    VALUES
+      ($1, $2, $3)
+    RETURNING
+      id, comment, event, userId;
+  `;
+  const values = [comment, eventId, userId];
+  const result = await query(q, values);
 
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+export async function listRegisterById(userId: number,eventId:number) {
+  const q = `
+  SELECT *
+  FROM
+    registrations
+  WHERE userid = $1 AND event = $2
+`;
+
+const result = await query(q, [userId,eventId]);
+
+if (result && result.rowCount === 1) {
+  return result.rows[0];
+}
+
+return null;
+}
+export async function clearRegistrationRelatedToEvent(eventId:number) {
+  const q = `
+  DELETE FROM registrations WHERE event = $1;`;
+  const result = await query(q, [eventId]);
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+  
+  return null;
+}

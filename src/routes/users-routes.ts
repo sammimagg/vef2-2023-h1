@@ -4,9 +4,9 @@ import { body, validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import { slugify } from '../lib/slugify.js';
 import { User,CustomRequest, Event } from '../types.js';
-import { deleteEvent, listEventByName, createEvent, listEventBySlug } from '../lib/db.js';
+import { listEventByName, createEvent, listEventBySlug, getEventBySlug, deleteEventBySlug } from '../lib/db.js';
 import { listEvent } from '../lib/events.js';
-export async function register(req: Request, res: Response, next: NextFunction) {
+export async function signupRoute(req: Request, res: Response, next: NextFunction) {
     const { name, username, password } = req.body;
     const userToCreate: Omit<User, 'id'>  = {
       name: name,
@@ -34,8 +34,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     // næsta middleware mun sjá um að skrá notanda inn
     // `username` og `password` verða ennþá sett sem rétt í `req`
     return next();
-  }
-  async function validateUser(username: string, password: string): Promise<string | null> {
+}
+async function validateUser(username: string, password: string): Promise<string | null> {
 
     const user = await findByUsername(username);
   
@@ -51,8 +51,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
   
     return null;
-  }
-  export const registerValidation = [
+}
+export const signupValidation = [
     body('username')
       .isLength({ min: 1, max: 64 })
       .withMessage('Skrá verður notendanafn, hámark 64 stafir.'),
@@ -69,9 +69,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       }
       return Promise.resolve();
     }),
-  ];
-
-  export async function validationCheck(req: Request, res: Response, next: NextFunction) {
+];
+export async function validationCheck(req: Request, res: Response, next: NextFunction) {
     const { name, username } = req.body;
   
     const validation = validationResult(req);
@@ -86,8 +85,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     }
   
     return next();
-  }
-  export async function registerGet(req: Request, res: Response, next: NextFunction) {
+}
+export async function signupGet(req: Request, res: Response, next: NextFunction) {
     if (req.isAuthenticated()) {
       return res.redirect('/');
     }
@@ -97,28 +96,28 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       data: {},
       errors: [],
     });
-  }
-  export function login(req: Request, res: Response, next: NextFunction) {
+}
+export function login(req: Request, res: Response, next: NextFunction) {
     if (req.isAuthenticated()) {
       return res.status(403).json({message: 'You are already logged in.'})
     }
     return res.status(200).json({message: 'Login succesful'})
-  }
-  export async function logout(req: Request, res: Response, next: NextFunction) {
+}
+export async function logout(req: Request, res: Response, next: NextFunction) {
     req.logout((err) => {
       if (err) {
         return next(err);
       }
       return res.status(200).json({message: "You have been logged out successfully."})
     });
-  }
-  export function loginSuccesful(req: Request, res: Response, next: NextFunction) {
+}
+export function loginSuccesful(req: Request, res: Response, next: NextFunction) {
     res.status(200).json({ message: 'Log in succesful' });
-  }
-  export function registerSuccesful(req: Request, res: Response, next: NextFunction) {  
+}
+export function signupSuccesful(req: Request, res: Response, next: NextFunction) {  
     res.status(200).json({ message: 'Sign up succesful' });
-  }
-  export async function validationCheckUpdate(req: Request, res: Response, next: NextFunction) {
+}
+export async function validationCheckUpdate(req: Request, res: Response, next: NextFunction) {
     const { name, description } = req.body;
     const { slug } = req.params;
     const { user } = req;
@@ -151,32 +150,9 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     }
   
     return next();
-  }
-
-
-export async function deleteRoute(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.params;
-
-  const result = await deleteEvent(parseInt(id));
-
-  if (result) {
-    return res.status(204).json({message: "The event was successfully deleted."})
-  }
-
-  return next(new Error('Error deleting the event.'));
 }
 
-export async function registerRoute(req: Request, res: Response, next: NextFunction) {
-  const { name, description, location, url } = req.body;
-  const slug = slugify(name,'-');
-  if (typeof(slug) !== 'string') {
-    return next(new Error('Villa við að búa til viðburð'));
-  }
-  //const created = await createEvent({ name, slug, description, location, url });
 
-  //if (created) {
-    //return res.redirect('/admin');
-  //}
 
-  return next(new Error('Villa við að búa til viðburð'));
-}
+
+

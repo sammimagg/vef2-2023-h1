@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { IncomingMessage } from 'express';
-
+import { DoneFunction as PassportDoneFunction } from 'passport-local';
 
 declare global {
   namespace Express {
@@ -17,7 +17,14 @@ export interface CustomRequest extends IncomingMessage {
   user?: User;
 }
 
-export type UserWithoutPassword = Omit<Express.User, 'password'>;
+export interface UserWithoutPassword {
+  id: number;
+  username: string;
+  name: string;
+  admin: boolean;
+}
+
+
 /*
 CREATE TABLE public.users (
     id serial primary key,
@@ -57,17 +64,7 @@ export type Event = {
     created: Date,
     updated: Date,
 }
-export type EventDb = {
-  id: number,
-  name: string,
-  slug: string,
-  description: string,
-  location?: string,
-  url?: string,
-  comment?: string,
-  created: Date,
-  updated: Date,
-}
+
 /* 
   CREATE TABLE public.registrations (
     id SERIAL PRIMARY KEY,
@@ -82,13 +79,18 @@ export type EventDb = {
  export type Registrations = {
     id: number,
     comment: string,
+    event: number,
+    userid: number,
     created: Date,
-    
  }
- export type RegistrationsDb = {
-  id: number,
-  event_id: number,
-  comment: string,
-  created: Date,
-  
-}
+
+export type DoneFunction = (
+  error: any,
+  user: UserWithoutPassword | false,
+  message?: { message: string },
+) => void;
+export type CustomVerifyFunction = (
+  username: string,
+  password: string,
+  done: PassportDoneFunction<UserWithoutPassword, { message: string }>,
+) => Promise<void>;
