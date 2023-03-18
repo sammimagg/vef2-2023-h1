@@ -5,6 +5,8 @@ import { comparePasswords, findById, findByUsername } from './users.js';
 import { CustomRequest, User, UserWithoutPassword  } from '../types.js'; // Import User type from the corresponding file
 import jwt , { JwtPayload }from 'jsonwebtoken';
 import localStrategy from './localStrategy.js';
+import { Strategy as LocalStrategy } from 'passport-local';
+import strategy from './localStrategy.js';
 dotenv.config();
 dotenv.config();
 const {
@@ -61,7 +63,7 @@ function generateJwtToken(user: UserWithoutPassword): string {
   return jwt.sign(payload, secret, options);
 }
 
-passport.use(localStrategy);
+passport.use(strategy)
 
 passport.serializeUser((user: any,cb) => {
 cb(null,1);

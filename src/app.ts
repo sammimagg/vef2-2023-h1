@@ -17,7 +17,7 @@ if (!connectionString || !sessionSecret) {
   process.exit(1);
 }
 
-const app = express();
+let app = express();
 
 app.use(express.json());
 
@@ -35,6 +35,7 @@ app.use(passport.session());
 
 // Move the router middleware after session and passport middleware
 app.use(router);
+
 
 /** Middleware sem sér um 404 villur. */
 app.use((req: Request, res: Response) => {
@@ -57,6 +58,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     .status(500)
     .json({ error: err.message ?? 'internal server error' });
 });
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
+export default app;
+
+

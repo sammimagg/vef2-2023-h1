@@ -45,6 +45,8 @@ import {
   sanitizationMiddleware 
 } from '../lib/validation.js';
 import { registerToEventRoute } from './registration-routes.js';
+import { uploadImage } from './images.js';
+//import app from '..app.js/'
 
 export const router = express.Router();
 
@@ -119,18 +121,23 @@ export async function index(req: Request, res: Response) {
 
   ]);
 }
+// Mig vantar paging.
+// Cloudinary jpg and png
+// Setja skal upp jest til að skrifa test. Skrifa skal test fyrir a.m.k.:fjóra endapunkta, þar sem a.m.k. einn krefst auðkenningar,a.m.k. einn tekur við gögnum
+
+
 
 // API document[200 OK]
 router.get('/', index);
 
 // Signup for new users [200 OK], [400 Bad Request]
-router.post( '/signup', signupValidation,  catchErrors(validationCheck),  catchErrors(signupRoute),  passport.authenticate('local', {failureMessage: 'Notandanafn eða lykilorð vitlaust.'}), signupSuccesful);
+router.post( '/signup', signupValidation,  catchErrors(validationCheck),  catchErrors(signupRoute),  passport.authenticate('local', {failureFlash: true}), signupSuccesful);
 // Login for users[200 OK], [400 Bad Request]
 router.post( '/login',  passport.authenticate('local', { session: false }),  authMiddleware);
 // Log out for users [200 OK]
 router.get( '/logout', logout);
 // List all events [200 OK]
-router.get('/events', listEvents);
+router.get('/events', listEvents);       
 // Gets event by slug [200 OK], [404 Not Found]
 router.get('/events/:slug', getEvent);
 // User Register to event [200 OK], [400 Bad Request]
@@ -143,12 +150,6 @@ router.get( '/admin/:slug', ensureAuthenticated, ensureLoggedIn, ensureAdmin, ca
 router.post( '/admin/', ensureAuthenticated, ensureLoggedIn, ensureAdmin, registrationValidationMiddleware('description'), xssSanitizationMiddleware('description'), sanitizationMiddleware('description'), createEventRoute);
 // [200 OK], [404 Not Found], [500 Internal Error]
 router.delete( '/admin/delete/:slug',ensureAuthenticated, ensureLoggedIn, ensureAdmin,  deleteEvent);
-
+// [200 OK], [404 Not Found], [500 Internal Error]
 router.patch('/admin/:slug',ensureAuthenticated, ensureLoggedIn, ensureAdmin, updateEventRoute);
-// Möguleiki á að eyða viðburðum og auka gögn
-// Paging á viðburðum
-// Almennir notendur og skráning á viðburði
-// Uppfærslur á pökkum og lagfæringar
-// Yfirlitssíða
-// Stakur viðburður
-// event.html?id=1
+router.post('/api/images', uploadImage);
