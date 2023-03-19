@@ -1,17 +1,16 @@
-# Vefforritun 2, 2023, verkefni 3 sýnilausn
+# Vefforritun 2, 2023, verkefni h1 
 
-Sýnilausn á verkefni 3.
+sam38@hi.is
 
 ```bash
-createdb vef2-2023-v3
+createdb vef2-2023-h1
 npm install
 npm run setup
 npm run dev # eða "npm start"
 ```
 
-Hægt að prófa request með því að importa `v3.postman.json` inn í Postman.
+Hægt að prófa request með því að importa `vef2-2023-h1.postman_collection.json` inn í Postman.
 
-## TODO
+## Document
 
-- [ ] Test
-- [ ] `DELETE` og eyða fyrst áföngum
+ Öll köll á http://localhost:3000/ síðunni
