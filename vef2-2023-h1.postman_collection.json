@@ -37,11 +37,57 @@
 		{
 			"name": "/login",
 			"request": {
+				"auth": {
+					"type": "jwt",
+					"jwt": [
+						{
+							"key": "algorithm",
+							"value": "HS256",
+							"type": "string"
+						},
+						{
+							"key": "isSecretBase64Encoded",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "payload",
+							"value": "{}",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "queryParamKey",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "header",
+							"value": "{}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"sammi\",\n    \"password\": \"12345678910\"\n}",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"0123456789\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -49,12 +95,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/login",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/login",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"login"
 					]
@@ -104,7 +152,21 @@
 			"name": "/events/:slug",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "https://vef2-2023-h1-production.up.railway.app/events/forritarahittingur-i-februar",
+					"protocol": "https",
+					"host": [
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"events",
+						"forritarahittingur-i-februar"
+					]
+				}
 			},
 			"response": []
 		},
@@ -125,7 +187,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -133,12 +195,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/events/verkefnastjorahittingur-i-april",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/events/verkefnastjorahittingur-i-april",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"events",
 						"verkefnastjorahittingur-i-april"
@@ -163,12 +227,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/admin/",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/admin/",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"admin",
 						""
@@ -194,7 +260,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"fdsdsfa\",\r\n    \"description\": \"Pruf2a\",\r\n    \"location\": \"prufa\",\r\n    \"url\": \"prufa\"\r\n\r\n}",
+					"raw": "{\r\n    \"name\": \"prufa\",\r\n    \"description\": \"Prufa\",\r\n    \"location\": \"prufa\",\r\n    \"url\": \"prufa\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -202,15 +268,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/admin/fdsfd",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/admin/",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"admin",
-						"fdsfd"
+						""
 					]
 				}
 			},
@@ -241,12 +309,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/admin/test-vidburdur-81",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/admin/test-vidburdur-81",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"admin",
 						"test-vidburdur-81"
@@ -271,12 +341,14 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/admin/delete/honnudahittingur-i-mars",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/admin/delete/honnudahittingur-i-mars",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"admin",
 						"delete",
@@ -289,7 +361,17 @@
 		{
 			"name": "Post images",
 			"request": {
-				"method": "POST",
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "formdata",
@@ -297,21 +379,56 @@
 						{
 							"key": "images",
 							"type": "file",
-							"src": "/C:/Users/sammi/Pictures/banner-svefn-og-heilsa-christmas-2.jpg"
+							"src": ""
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/users/1/profile-picture",
-					"protocol": "http",
+					"raw": "https://vef2-2023-h1-production.up.railway.app/users/5/profile-picture",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
 					],
-					"port": "3000",
 					"path": [
 						"users",
-						"1",
+						"5",
 						"profile-picture"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/admin/:slug/register",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://vef2-2023-h1-production.up.railway.app/admin/forritarahittingur-i-februar/register",
+					"protocol": "https",
+					"host": [
+						"vef2-2023-h1-production",
+						"up",
+						"railway",
+						"app"
+					],
+					"path": [
+						"admin",
+						"forritarahittingur-i-februar",
+						"register"
 					]
 				}
 			},
