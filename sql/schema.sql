@@ -3,7 +3,8 @@ CREATE TABLE public.users (
   name CHARACTER VARYING(64) NOT NULL,
   username character varying(64) NOT NULL UNIQUE,
   password character varying(256) NOT NULL,
-  admin BOOLEAN DEFAULT false
+  admin BOOLEAN DEFAULT false,
+  profile_picture VARCHAR(128)
 );
 
 CREATE TABLE public.events (

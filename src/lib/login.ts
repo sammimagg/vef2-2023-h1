@@ -1,29 +1,26 @@
-import passport, { PassportStatic } from 'passport';
-import dotenv from 'dotenv';
-import { Request, Response, NextFunction } from 'express';
-import { comparePasswords, findById, findByUsername } from './users.js';
-import { CustomRequest, User, UserWithoutPassword  } from '../types.js'; // Import User type from the corresponding file
-import jwt , { JwtPayload }from 'jsonwebtoken';
-import localStrategy from './localStrategy.js';
-import { Strategy as LocalStrategy } from 'passport-local';
-import strategy from './localStrategy.js';
+import passport, { PassportStatic } from "passport";
+import dotenv from "dotenv";
+import { Request, Response, NextFunction } from "express";
+import { comparePasswords, findById, findByUsername } from "./users.js";
+import { User, UserWithoutPassword } from "../types.js"; // Import User type from the corresponding file
+import jwt, { JwtPayload } from "jsonwebtoken";
+import strategy from "./localStrategy.js";
 dotenv.config();
-dotenv.config();
-const {
-  PORT: port = 3000,
-  SESSION_SECRET: sessionSecret,
-  DATABASE_URL: connectionString,
-} = process.env;
+const sessionSecret = process.env.SESSION_SECRET;
 
 export async function strat(
   username: string,
   password: string,
-  done: (error: any, user?: string | false, message?: string | undefined) => void,
+  done: (
+    error: any,
+    user?: string | false,
+    message?: string | undefined
+  ) => void
 ): Promise<void> {
   try {
     const user = await findByUsername(username);
     if (!user) {
-      return done(null, false, 'Incorrect username');
+      return done(null, false, "Incorrect username");
     }
 
     const result = await comparePasswords(password, user.password);
@@ -36,16 +33,15 @@ export async function strat(
       };
 
       const token = generateJwtToken(userWithoutPassword);
-      return done(null, token, 'Logged in successfully');
+      return done(null, token, "Logged in successfully");
     } else {
-      return done(null, false, 'Incorrect password');
+      return done(null, false, "Incorrect password");
     }
   } catch (err) {
     console.error(err);
     return done(err);
   }
 }
-
 
 function generateJwtToken(user: UserWithoutPassword): string {
   const payload = {
@@ -54,58 +50,66 @@ function generateJwtToken(user: UserWithoutPassword): string {
     admin: user.admin,
   };
 
-  const secret = process.env.SESSION_SECRET || 'your-secret-key';
+  const secret = process.env.SESSION_SECRET || "your-secret-key";
 
   const options = {
-    expiresIn: '24h', // Token expiration time (e.g., 24 hour)
+    expiresIn: "24h", // Token expiration time (e.g., 24 hour)
   };
 
   return jwt.sign(payload, secret, options);
 }
 
-passport.use(strategy)
+passport.use(strategy);
 
-passport.serializeUser((user: any,cb) => {
-cb(null,1);
+passport.serializeUser((user: any, cb) => {
+  cb(null, 1);
 });
 
 passport.deserializeUser((id: number, cb) => {
   findById(id)
-    .then(user => {
+    .then((user) => {
       if (user) {
         const userObject: User = {
           id: 1,
           name: user.name,
           username: user.username,
           password: user.password,
-          admin: user.admin
+          admin: user.admin,
         };
         cb(null, userObject);
       } else {
         cb(null, null);
       }
     })
-    .catch(err => {
+    .catch((err) => {
       cb(err, null);
     });
 });
 
-export function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
+export function ensureLoggedIn(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(403).json({ message: '401 Unauthorized, please log in' });
+  return res.status(403).json({ message: "401 Unauthorized, please log in" });
 }
 
 export function ensureAdmin(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated() && req.user?.admin) {
     return next();
   }
-  return res.status(403).json({ message: '403 Forbidden, User is not Admin' });
+  return res.status(403).json({ message: "403 Forbidden, User is not Admin" });
 }
-export function authMiddleware(req: Request, res: Response, next: NextFunction) {
+export function authMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   const user = req.user as UserWithoutPassword;
@@ -116,37 +120,66 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     username: user.username,
     isAdmin: user.admin,
     access_token: accessToken,
-    token_type: 'Bearer',
+    token_type: "Bearer",
     expires_in: 2400,
   });
 }
 const isUser = (payload: string | JwtPayload): payload is User => {
-  return typeof (payload as User).id !== 'undefined';
+  return typeof (payload as User).id !== "undefined";
 };
-export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+export const ensureAuthenticated = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.status(401).json({ message: 'No authorization header' });
+    return res.status(401).json({ message: "No authorization header" });
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: "No token provided" });
   }
-
-  const sessionSecret = process.env.SESSION_SECRET;
 
   try {
-    const decoded = jwt.verify(token, sessionSecret as jwt.Secret, { complete: true }) as { payload: string | JwtPayload };
+    const decoded = jwt.verify(token, sessionSecret as jwt.Secret, {
+      complete: true,
+    }) as { payload: string | JwtPayload };
     if (isUser(decoded.payload)) {
       req.user = decoded.payload;
       next();
     } else {
-      return res.status(401).json({ message: 'Invalid payload' });
+      return res.status(401).json({ message: "Invalid payload" });
     }
   } catch (err) {
-    console.log('Error during token verification:', err);
-    return res.status(401).json({ message: 'Failed to authenticate token' });
+    console.log("Error during token verification:", err);
+    return res.status(401).json({ message: "Failed to authenticate token" });
   }
 };
+export function checkTokenExpiration(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  if (!sessionSecret)
+    return res.status(500).json({ error: "No session secret" });
+  jwt.verify(token, sessionSecret, (err, decoded) => {
+    if (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expired" });
+      }
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    req.user = decoded as User;
+    next();
+  });
+}
+
 export default passport as PassportStatic;
+//

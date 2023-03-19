@@ -1,6 +1,6 @@
-import pg from 'pg';
-import  { Event } from '../types.js'
-import { eventMapper, eventsMapper } from './mappers.js';
+import pg from "pg";
+import { Event, User } from "../types.js";
+import { eventMapper, eventsMapper } from "./mappers.js";
 
 let savedPool: pg.Pool | undefined;
 
@@ -8,41 +8,32 @@ export function getPool(): pg.Pool {
   if (savedPool) {
     return savedPool;
   }
-  const  { DATABASE_URL: connectionString } = process.env;
+  const { DATABASE_URL: connectionString } = process.env;
   if (!connectionString) {
     console.error("Missing DATABASE_URL in .env");
-    throw new Error('Missing DATABASE_URL');
+    throw new Error("Missing DATABASE_URL");
   }
-  savedPool = new pg.Pool( { connectionString } );
+  savedPool = new pg.Pool({ connectionString });
 
-  savedPool.on('error', (err) => {
-    console.error('Villa í tengingu við gagnagrunn, forrit hættir', err);
-    throw new Error('error in db connection');
+  savedPool.on("error", (err) => {
+    console.error("Villa í tengingu við gagnagrunn, forrit hættir", err);
+    throw new Error("error in db connection");
   });
   return savedPool;
 }
-export async function query(q: string, values: Array<unknown> = [], silent = false) {
+export async function query(q: string, values: Array<unknown> = []) {
   const pool = getPool();
   let client;
   try {
     client = await pool.connect();
   } catch (e) {
-    if (!silent) {
-      console.error('unable to get client from pool');
-    }
     return null;
   }
   try {
-    const result = await client.query(q,values);
+    const result = await client.query(q, values);
     return result;
   } catch (e) {
-    if (!silent) {
-      console.error('unable to query', e);
-    }
-    if (!silent) {
-      console.info(q, values);
-    }
-    return null
+    return null;
   } finally {
     client.release();
   }
@@ -53,7 +44,7 @@ export async function poolEnd() {
   await pool.end();
 }
 export async function getEvents(): Promise<Array<Event> | null> {
-  const result = await query('SELECT * FROM events');
+  const result = await query("SELECT * FROM events");
   if (!result) {
     return null;
   }
@@ -61,15 +52,15 @@ export async function getEvents(): Promise<Array<Event> | null> {
   return event;
 }
 export async function getEventBySlug(slug: string): Promise<Event | null> {
-  const result = await query('SELECT * FROM events WHERE slug = $1', [slug]);
-  if(!result) {
+  const result = await query("SELECT * FROM events WHERE slug = $1", [slug]);
+  if (!result) {
     return null;
   }
 
   const event = eventMapper(result.rows[0]);
   return event;
 }
-export async function listEventByName(name:string) {
+export async function listEventByName(name: string) {
   const q = `
     SELECT
       id, name, slug, location, url, description, created, updated
@@ -134,25 +125,27 @@ export async function deleteEventBySlug(eventId: number): Promise<boolean> {
   let client;
   try {
     client = await pool.connect();
-    await client.query('BEGIN');
-    const deleteRegistrations = 'DELETE FROM registrations WHERE event = $1';
+    await client.query("BEGIN");
+    const deleteRegistrations = "DELETE FROM registrations WHERE event = $1";
     await client.query(deleteRegistrations, [eventId]);
 
-    const deleteEventQuery = 'DELETE FROM events WHERE id = $1';
+    const deleteEventQuery = "DELETE FROM events WHERE id = $1";
     await client.query(deleteEventQuery, [eventId]);
-    await client.query('COMMIT');
+    await client.query("COMMIT");
 
     return true;
   } catch (e) {
-    console.error('unable to delete event', e);
-    await client?.query('ROLLBACK');
+    console.error("unable to delete event", e);
+    await client?.query("ROLLBACK");
     return false;
   } finally {
     client?.release();
   }
 }
-export async function createEvent(event: Omit<Event, 'id'>,silent =false): Promise<Event | null> {
-  const {name, slug, description, url, location} = event
+export async function createEvent(
+  event: Omit<Event, "id">
+): Promise<Event | null> {
+  const { name, slug, description, url, location } = event;
   const q = `
     INSERT INTO events
       (name, slug, location, url, description)
@@ -170,7 +163,11 @@ export async function createEvent(event: Omit<Event, 'id'>,silent =false): Promi
   return null;
 }
 
-export async function registerToEvent(userId: number, eventId: number, comment:string) {
+export async function registerToEvent(
+  userId: number,
+  eventId: number,
+  comment: string
+) {
   const q = `
     INSERT INTO registrations
       (comment, event, userid)
@@ -188,7 +185,7 @@ export async function registerToEvent(userId: number, eventId: number, comment:s
 
   return null;
 }
-export async function listRegisterById(userId: number,eventId:number) {
+export async function listRegisterById(userId: number, eventId: number) {
   const q = `
   SELECT *
   FROM
@@ -196,21 +193,38 @@ export async function listRegisterById(userId: number,eventId:number) {
   WHERE userid = $1 AND event = $2
 `;
 
-const result = await query(q, [userId,eventId]);
+  const result = await query(q, [userId, eventId]);
 
-if (result && result.rowCount === 1) {
-  return result.rows[0];
-}
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
 
-return null;
+  return null;
 }
-export async function clearRegistrationRelatedToEvent(eventId:number) {
+export async function clearRegistrationRelatedToEvent(eventId: number) {
   const q = `
   DELETE FROM registrations WHERE event = $1;`;
   const result = await query(q, [eventId]);
   if (result && result.rowCount === 1) {
     return result.rows[0];
   }
-  
+
+  return null;
+}
+export async function putProfilePicture(
+  userId: number,
+  profilePictureUrl: string
+): Promise<User | null> {
+  const q = `
+  UPDATE users 
+  SET profile_picture = $1 
+  WHERE id = $2
+  RETURNING id, name, username, password, admin, profile_picture;
+  `;
+  const values = [profilePictureUrl, userId];
+  const result = await query(q, values);
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
   return null;
 }

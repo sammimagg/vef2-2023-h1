@@ -1,6 +1,5 @@
-import { Request } from 'express';
-import { IncomingMessage } from 'express';
-import { DoneFunction as PassportDoneFunction } from 'passport-local';
+import { IncomingMessage } from "express";
+import { DoneFunction as PassportDoneFunction } from "passport-local";
 
 declare global {
   namespace Express {
@@ -24,7 +23,6 @@ export interface UserWithoutPassword {
   admin: boolean;
 }
 
-
 /*
 CREATE TABLE public.users (
     id serial primary key,
@@ -35,12 +33,13 @@ CREATE TABLE public.users (
   );
 */
 export type User = {
-    id: number,
-    name: string,
-    username: string,
-    password: string,
-    admin: boolean
-}
+  id: number;
+  name: string;
+  username: string;
+  password: string;
+  admin: boolean;
+  profile_picture?: string;
+};
 
 /*  
   CREATE TABLE public.events (
@@ -55,15 +54,15 @@ export type User = {
   );
  */
 export type Event = {
-    id: number,
-    name: string,
-    slug: string,
-    description: string,
-    location?: string,
-    url?: string,
-    created: Date,
-    updated: Date,
-}
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  location?: string;
+  url?: string;
+  created: Date;
+  updated: Date;
+};
 
 /* 
   CREATE TABLE public.registrations (
@@ -76,21 +75,21 @@ export type Event = {
     CONSTRAINT fk_userId FOREIGN KEY (userId) REFERENCES users (id)
   );
   */
- export type Registrations = {
-    id: number,
-    comment: string,
-    event: number,
-    userid: number,
-    created: Date,
- }
+export type Registrations = {
+  id: number;
+  comment: string;
+  event: number;
+  userid: number;
+  created: Date;
+};
 
 export type DoneFunction = (
   error: any,
   user: UserWithoutPassword | false,
-  message?: { message: string },
+  message?: { message: string }
 ) => void;
 export type CustomVerifyFunction = (
   username: string,
   password: string,
-  done: PassportDoneFunction<UserWithoutPassword, { message: string }>,
+  done: PassportDoneFunction<UserWithoutPassword, { message: string }>
 ) => Promise<void>;

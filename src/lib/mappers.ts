@@ -1,4 +1,4 @@
-import { Event} from "../types.js";
+import { Event } from "../types.js";
 
 export function eventMapper(potentialEvent: unknown): Event | null {
   const event = potentialEvent as Event | null;
@@ -14,7 +14,7 @@ export function eventMapper(potentialEvent: unknown): Event | null {
   ) {
     return null;
   }
-  
+
   const mapped: Event = {
     id: event.id,
     name: event.name,
@@ -25,16 +25,16 @@ export function eventMapper(potentialEvent: unknown): Event | null {
     created: event.created,
     updated: event.updated,
   };
-  
+
   return mapped;
 }
 export function eventsMapper(potentialEvents: unknown): Array<Event> {
-    const events = potentialEvents  as Array<unknown> | null;
+  const events = potentialEvents as Array<unknown> | null;
 
-    if (!events) {
-        return [];
-    }
+  if (!events) {
+    return [];
+  }
 
-    const mapped = events.map((dept) => eventMapper(dept));
-    return mapped.filter((i): i is Event => Boolean(i));
+  const mapped = events.map((dept) => eventMapper(dept));
+  return mapped.filter((i): i is Event => Boolean(i));
 }

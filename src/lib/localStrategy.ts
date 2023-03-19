@@ -1,22 +1,26 @@
-import { Strategy as LocalStrategy, VerifyFunction } from 'passport-local';
-import { User, UserWithoutPassword, CustomVerifyFunction,DoneFunction } from '../types.js';
-import { findByUsername, comparePasswords } from './users.js';
-
+import { Strategy as LocalStrategy } from "passport-local";
+import {
+  User,
+  UserWithoutPassword,
+  CustomVerifyFunction,
+  DoneFunction,
+} from "../types.js";
+import { findByUsername, comparePasswords } from "./users.js";
 
 const strategyCallback: CustomVerifyFunction = async (
-    username: string,
-    password: string,
-    done: DoneFunction,
-  ) => {
+  username: string,
+  password: string,
+  done: DoneFunction
+) => {
   const user: User | boolean = await findByUsername(username);
 
   if (!user) {
-    return done(null, false, { message: 'Incorrect username.' });
+    return done(null, false, { message: "Incorrect username." });
   }
 
   const isValidPassword = await comparePasswords(password, user.password);
   if (!isValidPassword) {
-    return done(null, false, { message: 'Incorrect password.' });
+    return done(null, false, { message: "Incorrect password." });
   }
 
   const userWithoutPassword: UserWithoutPassword = {
@@ -30,7 +34,7 @@ const strategyCallback: CustomVerifyFunction = async (
 };
 
 const strategy = new LocalStrategy(
-    { usernameField: 'username', passwordField: 'password' },
-    strategyCallback,
-  );
-  export default strategy;
+  { usernameField: "username", passwordField: "password" },
+  strategyCallback
+);
+export default strategy;
