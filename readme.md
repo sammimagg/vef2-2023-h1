@@ -14,3 +14,7 @@ Hægt að prófa request með því að importa `vef2-2023-h1.postman_collection
 ## Document
 
  Öll köll á http://localhost:3000/ síðunni
+
+## Notendur skráðir í gagnagrunn
+Notandi: admin, user
+Lykilorð: 0123456789,0123456789

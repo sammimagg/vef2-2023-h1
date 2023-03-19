@@ -29,7 +29,7 @@ import {
   xssSanitizationMiddleware,
   sanitizationMiddleware,
 } from "../lib/validation.js";
-import { registerToEventRoute } from "./registration-routes.js";
+import { registerToEventRoute, registerUsesrToEventRoute } from "./registration-routes.js";
 import { uploadImage } from "./images.js";
 
 //import app from '..app.js/'
@@ -111,6 +111,41 @@ export async function index(req: Request, res: Response, next: NextFunction) {
         location: "prufa",
         url: "prufa",
       },
+    },
+    {
+      href: "/admin/:slug/register",
+      methods: ["POST"],
+      response: ["200 OK","404 Not found"],
+      description:
+        "POST to get all user registered to event/:slug",
+      authorization: "TYPE: Bearer Token. TOKEN:hashed string",
+      privileges: "Admin",
+      example_responde: [
+        {
+            "id": 2,
+            "name": "User",
+            "username": "user",
+            "password": "$2b$11$lO6A/nVVIH/T5e2xkWhJmuSormWYwniUBiKHHLIGp27rSozcgypUe",
+            "admin": true,
+            "profile_picture": null
+        },
+        {
+            "id": 3,
+            "name": "Forvitinn forritari",
+            "username": "forritari",
+            "password": "$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii",
+            "admin": false,
+            "profile_picture": null
+        },
+        {
+            "id": 4,
+            "name": "Jón Jónsson",
+            "username": "jonjons",
+            "password": "$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii",
+            "admin": false,
+            "profile_picture": null
+        }
+    ]
     },
     {
       href: "/admin/:delete/:slug",
@@ -196,6 +231,14 @@ router.get(
   ensureLoggedIn,
   ensureAdmin,
   catchErrors(eventRoute)
+);
+// Gets register to event by slug. [200 OK], [400 Bad Request]
+router.get(
+  "/admin/:slug/register",
+  ensureAuthenticated,
+  ensureLoggedIn,
+  ensureAdmin,
+  catchErrors(registerUsesrToEventRoute)
 );
 // [200 OK], [400 Bad Request]
 router.post(

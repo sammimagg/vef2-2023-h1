@@ -228,3 +228,18 @@ export async function putProfilePicture(
   }
   return null;
 }
+export async function getUserRegisterToEvent(slug: string) {
+  const q = `
+  SELECT users.*
+  FROM users
+  INNER JOIN registrations ON registrations.userId = users.id
+  INNER JOIN events ON events.id = registrations.event
+  WHERE events.slug = $1;
+  `
+  const values = [slug];
+  const result = await query(q,values);
+  if(result) {
+    return result.rows;
+  }
+  return null;
+}
