@@ -254,3 +254,23 @@ export async function getEventsRegisterOnUser(id: string) {
   if(result) return result.rows
   return  null
 }
+export async function getProfile(username: string): Promise<User | null> {
+  const q = `SELECT * FROM users WHERE username =  $1;`
+  const values = [username];
+  const result = await query(q,values);
+  if (result && result.rows.length > 0) {
+    const userFromDb = result.rows[0];
+    const user: User = {
+      id: userFromDb.id,
+      name: userFromDb.name,
+      username: userFromDb.username,
+      password: userFromDb.password,
+      admin: userFromDb.admin,
+      profile_picture: userFromDb.profile_picture,
+    };
+
+    return user;
+  }
+
+  return null;
+}
