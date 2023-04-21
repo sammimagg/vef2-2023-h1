@@ -172,7 +172,7 @@ export async function getEventsRegisterTo(
     const { id } = req.params;
     const events = await getEventsRegisterOnUser(id);
     
-    if(events && events.length > 0) {
+    if(events) {
       return res.status(200).json(events);
     } else {
       return res.status(400).json({ error: 'No events found for this user' });

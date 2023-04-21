@@ -230,7 +230,7 @@ export async function putProfilePicture(
 }
 export async function getUserRegisterToEvent(slug: string) {
   const q = `
-  SELECT users.*
+  SELECT users.id, users.name, users.username, users.profile_picture
   FROM users
   INNER JOIN registrations ON registrations.userId = users.id
   INNER JOIN events ON events.id = registrations.event
@@ -252,10 +252,6 @@ export async function getEventsRegisterOnUser(id: string) {
   `
   const values = [id];
   const result = await query(q,values);
-  if(result) {
-    return result.rows;
-  }
-  return null;
-
+  if(result) return result
   return  null
 }
