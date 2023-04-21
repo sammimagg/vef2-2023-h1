@@ -3,7 +3,7 @@ import { createUser, findByUsername } from "../lib/users.js";
 import { body, validationResult } from "express-validator";
 
 import { User } from "../types.js";
-import { listEventByName } from "../lib/db.js";
+import { getEventsRegisterOnUser, listEventByName } from "../lib/db.js";
 import { listEvent } from "../lib/events.js";
 export async function signupRoute(
   req: Request,
@@ -164,4 +164,17 @@ export async function validationCheckUpdate(
   }
 
   return next();
+}
+export async function getEventsRegisterTo(  
+  req: Request,
+  res: Response,
+  next: NextFunction) {
+    const { id } = req.params;
+    const events = await getEventsRegisterOnUser(id);
+    
+    if(events && events.length > 0) {
+      return res.status(200).json(events);
+    } else {
+      return res.status(400).json({ error: 'No events found for this user' });
+    }
 }

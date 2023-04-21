@@ -36,8 +36,9 @@ export async function registerToEventRoute(
   return res.status(500).json({ message: "Error register to an event" });
 }
 
-export async function registerUsesrToEventRoute(  req: Request, res: Response, next: NextFunction) {
+export async function registerUsersToEventRoute(  req: Request, res: Response, next: NextFunction) {
   const { slug } = req.params;
+ 
   const eventSlug = await getEventBySlug(slug);
   if (!eventSlug) {
     return res.status(404).json({error: 'No event by that name'});

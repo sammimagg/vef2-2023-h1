@@ -243,3 +243,19 @@ export async function getUserRegisterToEvent(slug: string) {
   }
   return null;
 }
+export async function getEventsRegisterOnUser(id: string) {
+  const q =`
+    SELECT events.*
+    FROM events
+    JOIN registrations ON events.id = registrations.event
+    WHERE registrations.userId = $1;
+  `
+  const values = [id];
+  const result = await query(q,values);
+  if(result) {
+    return result.rows;
+  }
+  return null;
+
+  return  null
+}

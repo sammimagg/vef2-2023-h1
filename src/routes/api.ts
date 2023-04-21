@@ -19,6 +19,7 @@ import {
   signupSuccesful,
   signupRoute,
   signupValidation,
+  getEventsRegisterTo,
 } from "../routes/users-routes.js";
 import { catchErrors } from "../lib/catch-errors.js";
 import { body } from "express-validator";
@@ -29,7 +30,7 @@ import {
   xssSanitizationMiddleware,
   sanitizationMiddleware,
 } from "../lib/validation.js";
-import { registerToEventRoute, registerUsesrToEventRoute } from "./registration-routes.js";
+import { registerToEventRoute, registerUsersToEventRoute } from "./registration-routes.js";
 import { uploadImage } from "./images.js";
 
 //import app from '..app.js/'
@@ -200,9 +201,16 @@ router.post(
 router.get("/logout", logout);
 // List all events [200 OK]
 router.get("/events", listEvents);
+
 // Gets event by slug [200 OK], [404 Not Found]
 router.get("/events/:slug", getEvent);
 // User Register to event [200 OK], [400 Bad Request]
+router.get(
+  "/events/:slug/register",
+  catchErrors(registerUsersToEventRoute)
+);
+// Gets register to event by slug. [200 OK], [400 Bad Request]
+
 router.post(
   "/events/:slug",
   checkTokenExpiration,
@@ -232,13 +240,7 @@ router.get(
   ensureAdmin,
   catchErrors(eventRoute)
 );
-// Gets register to event by slug. [200 OK], [400 Bad Request]
-router.get(
-  "/event/:slug/register",
-  ensureAuthenticated,
-  ensureLoggedIn,
-  catchErrors(registerUsesrToEventRoute)
-);
+
 // [200 OK], [400 Bad Request]
 router.post(
   "/admin/",
@@ -276,3 +278,7 @@ router.put(
   ensureLoggedIn,
   uploadImage
 );
+router.get(
+  "/user/:id/registered",
+  getEventsRegisterTo
+)
