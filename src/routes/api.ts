@@ -20,6 +20,7 @@ import {
   signupRoute,
   signupValidation,
   getEventsRegisterTo,
+  userStatus,
 } from "../routes/users-routes.js";
 import { catchErrors } from "../lib/catch-errors.js";
 import { body } from "express-validator";
@@ -196,6 +197,13 @@ router.post(
   "/login",
   passport.authenticate("local", { session: false }),
   authMiddleware
+);
+router.get(
+  "/user",
+  checkTokenExpiration,
+  ensureAuthenticated,
+  ensureLoggedIn,
+  userStatus
 );
 // Log out for users [200 OK]
 router.get("/logout", logout);
