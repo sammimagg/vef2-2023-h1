@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
-import { cors } from "./lib/cors.js";
+import cors from "cors";
+
+
+
 import { router } from "./routes/api.js";
 import passport from "passport";
 import session, { SessionOptions } from "express-session";
@@ -18,8 +21,9 @@ if (!connectionString || !sessionSecret) {
 const app = express();
 
 app.use(express.json());
+// Enable all CORS requests
+app.use(cors());
 
-app.use(cors);
 app.use(
   fileUpload({
     useTempFiles: true,

@@ -1,15 +1,13 @@
+import app from "./app.js";
+import dotenv from "dotenv";
+import { router } from "./routes/api.js";
 
-import express, { NextFunction, Request, Response } from "express";
-const app = express();
+dotenv.config();
+const { PORT: port = 3000 } = process.env;
 
-// Allow all origins to make requests to your server
-app.use();
+// Move the router middleware after session and passport middleware
+app.use(router);
 
-// Your routes and middleware come here
-
-// Error handling middleware
-
-
-app.listen(3000, () => {
-  console.log("Server listening on port 3000");
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
