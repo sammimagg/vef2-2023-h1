@@ -1,13 +1,19 @@
-import app from "./app.js";
-import dotenv from "dotenv";
-import { router } from "./routes/api.js";
 
-dotenv.config();
-const { PORT: port = 3000 } = process.env;
+import cors from "cors";
+import express, { NextFunction, Request, Response } from "express";
+const app = express();
 
-// Move the router middleware after session and passport middleware
-app.use(router);
+// Allow all origins to make requests to your server
+app.use(cors());
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+// Your routes and middleware come here
+
+// Error handling middleware
+app.use((err: Error,   req: Request,  res: Response,  next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
+app.listen(3000, () => {
+  console.log("Server listening on port 3000");
 });
