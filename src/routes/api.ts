@@ -234,10 +234,9 @@ router.get(
 );
 // Gets register to event by slug. [200 OK], [400 Bad Request]
 router.get(
-  "/admin/:slug/register",
+  "/event/:slug/register",
   ensureAuthenticated,
   ensureLoggedIn,
-  ensureAdmin,
   catchErrors(registerUsesrToEventRoute)
 );
 // [200 OK], [400 Bad Request]
