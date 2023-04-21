@@ -5,6 +5,7 @@ import { comparePasswords, findById, findByUsername } from "./users.js";
 import { User, UserWithoutPassword } from "../types.js"; // Import User type from the corresponding file
 import jwt, { JwtPayload } from "jsonwebtoken";
 import strategy from "./localStrategy.js";
+import { getProfile } from "./db.js";
 dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
 
@@ -103,7 +104,7 @@ export function ensureAdmin(req: Request, res: Response, next: NextFunction) {
   }
   return res.status(403).json({ message: "403 Forbidden, User is not Admin" });
 }
-export function authMiddleware(
+export async function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -114,15 +115,19 @@ export function authMiddleware(
 
   const user = req.user as UserWithoutPassword;
   const accessToken = generateJwtToken(user);
-
-  res.status(200).json({
-    user_id: user.id,
-    username: user.username,
-    isAdmin: user.admin,
-    access_token: accessToken,
-    token_type: "Bearer",
-    expires_in: 2400,
-  });
+  const userDb = await getProfile(user.username);
+  if(userDb) {
+    res.status(200).json({
+      user_id: user.id,
+      username: user.username,
+      name: userDb.name,
+      profile_picture: userDb.profile_picture,
+      isAdmin: user.admin,
+      access_token: accessToken,
+      token_type: "Bearer",
+      expires_in: 2400,
+    });
+  }
 }
 const isUser = (payload: string | JwtPayload): payload is User => {
   return typeof (payload as User).id !== "undefined";
