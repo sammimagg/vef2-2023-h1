@@ -3,7 +3,7 @@ import { createUser, findByUsername } from "../lib/users.js";
 import { body, validationResult } from "express-validator";
 
 import { User } from "../types.js";
-import { getEventsRegisterOnUser, getProfile, listEventByName } from "../lib/db.js";
+import { getEventsRegisterOnUser, getProfile, listEventByName, updateProfileDB } from "../lib/db.js";
 import { listEvent } from "../lib/events.js";
 export async function signupRoute(
   req: Request,
@@ -186,6 +186,22 @@ export async function userStatus(
   const userTest = req.user;
   if(userTest != undefined) {
     const user = await getProfile(userTest.username)
+    res.status(200).json({user});
+  }
+  else {
+    res.status(500);
+  }
+
+}
+export async function updateProfile(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = parseInt(req.params.id);
+  const { username, name } = req.body;
+  if(req.body) {
+    const user = await updateProfileDB(userId,username,name)
     res.status(200).json({user});
   }
   else {

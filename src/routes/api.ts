@@ -21,6 +21,7 @@ import {
   signupValidation,
   getEventsRegisterTo,
   userStatus,
+  updateProfile,
 } from "../routes/users-routes.js";
 import { catchErrors } from "../lib/catch-errors.js";
 import { body } from "express-validator";
@@ -289,4 +290,10 @@ router.put(
 router.get(
   "/user/:id/registered",
   getEventsRegisterTo
+)
+router.put("/user/:id",
+checkTokenExpiration,
+ensureAuthenticated,
+ensureLoggedIn,
+updateProfile
 )

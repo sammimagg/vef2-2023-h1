@@ -274,3 +274,29 @@ export async function getProfile(username: string): Promise<User | null> {
 
   return null;
 }
+export async function updateProfileDB(userId: number, updatedUsername: string, updatedName: string): Promise<User | null> {
+  const q = `
+    UPDATE users
+    SET username = $1, name = $2
+    WHERE id = $3
+    RETURNING *;
+  `;
+  const values = [updatedUsername, updatedName, userId];
+  const result = await query(q, values);
+
+  if (result && result.rows.length > 0) {
+    const userFromDb = result.rows[0];
+    const user: User = {
+      id: userFromDb.id,
+      name: userFromDb.name,
+      username: userFromDb.username,
+      password: userFromDb.password,
+      admin: userFromDb.admin,
+      profile_picture: userFromDb.profile_picture,
+    };
+
+    return user;
+  }
+
+  return null;
+}
