@@ -312,7 +312,7 @@ export async function isUserRegisterToEventBySLug(slug:string, userId:number) {
   const values = [slug, userId];
   const result = await query(q, values);
   if(result) {
-    return result
+    return result.rows
   }
   return null;
 
