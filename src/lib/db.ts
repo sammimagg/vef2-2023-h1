@@ -319,9 +319,8 @@ export async function isUserRegisterToEventBySLug(slug:string, userId:number) {
 }
 export async function unregisterEventBySLug(slug: string,userId: number) {
   const q = `
-  DELETE FROM 
-  registrations WHERE 
-  event = ( SELECT id FROM events WHERE $1 = 'forritarahittingur-i-februar' )
+  DELETE FROM registrations 
+  WHERE event = (SELECT id FROM events WHERE slug = $1) 
   AND userId = $2;
   `
   const values = [slug, userId];
