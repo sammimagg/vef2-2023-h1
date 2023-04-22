@@ -32,7 +32,7 @@ import {
   xssSanitizationMiddleware,
   sanitizationMiddleware,
 } from "../lib/validation.js";
-import { registerToEventRoute, registerUsersToEventRoute } from "./registration-routes.js";
+import { isUserRegisteredToEventRoute, registerToEventRoute, registerUsersToEventRoute, unregisterToEventRoute } from "./registration-routes.js";
 import { uploadImage } from "./images.js";
 
 //import app from '..app.js/'
@@ -295,5 +295,20 @@ router.put("/user/:id",
 checkTokenExpiration,
 ensureAuthenticated,
 ensureLoggedIn,
-updateProfile
+updateProfile,
+uploadImage
+)
+router.delete(
+  "/user/:slug",
+  checkTokenExpiration,
+  ensureAuthenticated,
+  ensureLoggedIn,
+  unregisterToEventRoute
+  )
+router.get(
+  "/user/:slug",
+  checkTokenExpiration,
+  ensureAuthenticated,
+  ensureLoggedIn,
+  isUserRegisteredToEventRoute
 )

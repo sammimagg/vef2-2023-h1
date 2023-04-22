@@ -300,3 +300,34 @@ export async function updateProfileDB(userId: number, updatedUsername: string, u
 
   return null;
 }
+export async function isUserRegisterToEventBySLug(slug:string, userId:number) {
+  const q = `
+  SELECT EXISTS (
+    SELECT 1 FROM registrations
+    WHERE event = (
+      SELECT id FROM events WHERE slug = $1
+    ) AND userId = $2
+  );
+    `
+  const values = [slug, userId];
+  const result = await query(q, values);
+  if(result) {
+    return result
+  }
+  return null;
+
+}
+export async function unregisterEventBySLug(slug: string,userId: number) {
+  const q = `
+  DELETE FROM 
+  registrations WHERE 
+  event = ( SELECT id FROM events WHERE $1 = 'forritarahittingur-i-februar' )
+  AND userId = $2;
+  `
+  const values = [slug, userId];
+  const result = await query(q, values);
+  if(result) {
+    return { message: "Event unregistration successful" };
+  }
+  return null
+}
